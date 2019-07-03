@@ -12,15 +12,7 @@ function getCode(event) {
     throw new Error('NO CODE');
 }
 
-exports.handler = async (event) => {
-    console.log(event);
-    const code = getCode(event);
-
-    const url = process.env.TOKEN_API_URL;
-    const redirectUri = process.env.REDIRECT_URI;
-    const clientId = process.env.CLIENT_ID;
-    const clientSecret = process.env.CLIENT_SECRET;
-
+async function retrieveToken(code, redirectUri, clientId, clientSecret, url) {
     const form = new FormData();
     form.append('grant_type', 'authorization_code');
     form.append('code', code);
@@ -31,8 +23,10 @@ exports.handler = async (event) => {
     const result = await got(url, {body: form});
     console.log(result.body);
 
-    const accessToken = JSON.parse(result.body).access_token;
+    return JSON.parse(result.body).access_token;
+}
 
+async function saveToken(accessToken) {
     AWS.config.update({
         region: "ap-northeast-1",
     });
@@ -46,7 +40,20 @@ exports.handler = async (event) => {
         }
     };
 
-    await docClient.put(params).promise();
+    return await docClient.put(params).promise();
+}
+
+exports.handler = async (event) => {
+    console.log(event);
+    const accessToken = await retrieveToken(
+        getCode(event),
+        process.env.REDIRECT_URI,
+        process.env.CLIENT_ID,
+        process.env.CLIENT_SECRET,
+        process.env.TOKEN_API_URL
+    );
+
+    await saveToken(accessToken);
 
     return {
         statusCode: 200,
