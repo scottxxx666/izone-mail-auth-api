@@ -2,5 +2,11 @@
   "dependencies": {
     "form-data": "^2.4.0",
     "got": "^9.6.0"
+  },
+  "devDependencies": {
+    "jest": "^24.8.0"
+  },
+  "scripts": {
+    "test": "jest"
   }
 }
