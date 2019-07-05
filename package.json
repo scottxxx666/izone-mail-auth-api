@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "aws-sdk": "^2.488.0",
     "form-data": "^2.4.0",
     "got": "^9.6.0"
   },
